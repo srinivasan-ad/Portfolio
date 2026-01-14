@@ -5,20 +5,46 @@ export default function ProgressBar() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    let cur = 0;
-    let pause = false
-    const interval = setInterval(() => {
-    if(pause) return;
-    cur += 1;
-    if(cur !== 0 && cur % 20 == 0)
-    {
-        pause = true;
-        setTimeout(() => {
-            pause = false;
-        },3000);
+     let cur = 0;
+  let pause = false;
+  let loop = 0;
+  let end = 0;
+  let inLoopPause = false;
+
+  const interval = setInterval(() => {
+    if (loop >= 5) {
+      setProgress(99);
+      clearInterval(interval);
+      return;
     }
+
+    if (pause) return;
+
+    cur += 1;
     setProgress(cur);
-    if (cur >= 80) clearInterval(interval);
+
+    if (cur % (20 + end) === 0 && cur < 80 + end && !inLoopPause) {
+      pause = true;
+      inLoopPause = true;
+
+      setTimeout(() => {
+        pause = false;
+        inLoopPause = false;
+      }, 1500);
+    }
+
+    if (cur >= 80 + end) {
+      pause = true;
+
+      setTimeout(() => {
+        loop++;
+        end += 4;
+        cur = 0;
+        if(loop < 5)
+        setProgress(0);
+        pause = false;
+      }, 6000);
+    }
   }, 100);
   return () => clearInterval(interval);
   }, []);
